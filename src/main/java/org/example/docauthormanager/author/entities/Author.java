@@ -5,7 +5,7 @@ import jakarta.persistence.*;
 
 @Entity
 @Table(name = "author")
-public class AuthorDO {
+public class Author {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -14,9 +14,9 @@ public class AuthorDO {
     private String firstName;
     private String lastName;
 
-    public AuthorDO() {}
+    public Author() {}
 
-    public AuthorDO(String firstName, String lastName) {
+    public Author(String firstName, String lastName) {
         this.firstName = firstName;
         this.lastName = lastName;
     }
