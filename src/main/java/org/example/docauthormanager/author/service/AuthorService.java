@@ -12,7 +12,7 @@ public interface AuthorService {
 
     Author createAuthor(Author author);
 
-    Author updateAuthor(Author author, Long authorId);
+    Author updateAuthor(Long authorId, Author author);
 
     void deleteAuthorById(Long authorId);
 }
