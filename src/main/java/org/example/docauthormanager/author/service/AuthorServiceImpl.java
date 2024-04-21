@@ -33,7 +33,7 @@ public class AuthorServiceImpl implements AuthorService{
     }
 
     @Override
-    public Author updateAuthor(final Author newAuthor, final Long authorId) {
+    public Author updateAuthor(final Long authorId, final Author newAuthor) {
         return authorRepository.findById(authorId)
                 .map(authorToUpdate -> {
                     authorToUpdate.setFirstName(newAuthor.getFirstName());
