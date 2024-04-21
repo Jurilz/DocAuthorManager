@@ -4,7 +4,6 @@ package org.example.docauthormanager.author.entities;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "author")
 public class Author {
 
     @Id
