@@ -6,8 +6,8 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
-import org.example.docauthormanager.author.converter.AuthorDTOConverter;
 import org.example.docauthormanager.author.entities.Author;
 import org.example.docauthormanager.author.entities.AuthorDTO;
 import org.example.docauthormanager.author.service.AuthorService;
@@ -20,17 +20,17 @@ import java.util.List;
 
 @RestController
 @RequestMapping(path = AuthorController.AUTHORS_PATH)
+@SecurityRequirement(name = AuthorController.BASIC_AUTH)
 public class AuthorController {
 
     protected static final String AUTHORS_PATH = "/authors";
     protected static final String ID_PATH = "/{id}";
+    protected static final String BASIC_AUTH = "basicAuth";
 
     private final AuthorService authorService;
-    private final AuthorDTOConverter authorDTOConverter;
 
-    public AuthorController(AuthorService authorService, AuthorDTOConverter authorDTOConverter) {
+    public AuthorController(AuthorService authorService) {
         this.authorService = authorService;
-        this.authorDTOConverter = authorDTOConverter;
     }
 
     @Operation(summary = "Get an author by his/her id")
@@ -75,7 +75,7 @@ public class AuthorController {
     })
     @PostMapping
     public Author createAuthor(@Valid @RequestBody AuthorDTO author) {
-        return authorService.createAuthor(authorDTOConverter.convert(author));
+        return authorService.createAuthor(author);
     }
 
     @Operation(summary = "Updates an author")
@@ -89,7 +89,7 @@ public class AuthorController {
     })
     @PutMapping(ID_PATH)
     public Author updateAuthor(@PathVariable Long id, @Valid @RequestBody AuthorDTO author) {
-        return authorService.updateAuthor(id, authorDTOConverter.convert(author));
+        return authorService.updateAuthor(id, author);
     }
 
     @Operation(summary = "Deletes an author")
