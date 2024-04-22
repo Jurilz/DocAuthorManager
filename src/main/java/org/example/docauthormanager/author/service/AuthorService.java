@@ -1,6 +1,7 @@
 package org.example.docauthormanager.author.service;
 
 import org.example.docauthormanager.author.entities.Author;
+import org.example.docauthormanager.author.entities.AuthorDTO;
 
 import java.util.List;
 
@@ -10,9 +11,9 @@ public interface AuthorService {
 
     List<Author> findAllAuthors();
 
-    Author createAuthor(Author author);
+    Author createAuthor(AuthorDTO author);
 
-    Author updateAuthor(Long authorId, Author author);
+    Author updateAuthor(Long authorId, AuthorDTO author);
 
     void deleteAuthorById(Long authorId);
 }
