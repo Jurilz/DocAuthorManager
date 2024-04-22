@@ -8,7 +8,10 @@ import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import jakarta.validation.Valid;
 import org.example.docauthormanager.document.entities.Document;
+import org.example.docauthormanager.document.entities.DocumentDTO;
 import org.example.docauthormanager.document.service.DocumentService;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -17,9 +20,11 @@ import java.util.List;
 
 @RestController
 @RequestMapping(path = DocumentController.DOCUMENTS_PATH)
+@SecurityRequirement(name = DocumentController.BASIC_AUTH)
 public class DocumentController {
     protected static final String DOCUMENTS_PATH = "/documents";
     protected static final String ID_PATH = "/{id}";
+    protected static final String BASIC_AUTH = "basicAuth";
 
     private final DocumentService documentService;
 
@@ -71,7 +76,7 @@ public class DocumentController {
             @ApiResponse(responseCode = "401", description = "The user is not authenticated")
     })
     @PostMapping
-    public Document createDocument(@RequestBody Document document) {
+    public Document createDocument(@Valid @RequestBody DocumentDTO document) {
         return documentService.createDocument(document);
     }
 
@@ -85,7 +90,7 @@ public class DocumentController {
             @ApiResponse(responseCode = "401", description = "The user is not authenticated")
     })
     @PutMapping(ID_PATH)
-    public Document updateDocument(@PathVariable Long id, @RequestBody Document document) {
+    public Document updateDocument(@PathVariable Long id, @Valid @RequestBody DocumentDTO document) {
         return documentService.updateDocument(id, document);
     }
 
