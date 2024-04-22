@@ -1,6 +1,7 @@
 package org.example.docauthormanager.document.service;
 
 import org.example.docauthormanager.document.entities.Document;
+import org.example.docauthormanager.document.entities.DocumentDTO;
 
 import java.util.List;
 
@@ -10,9 +11,9 @@ public interface DocumentService {
 
     List<Document> findAllDocuments();
 
-    Document createDocument(Document document);
+    Document createDocument(DocumentDTO document);
 
-    Document updateDocument(Long documentId, Document document);
+    Document updateDocument(Long documentId, DocumentDTO document);
 
     void deleteDocument(Long documentId);
 }
