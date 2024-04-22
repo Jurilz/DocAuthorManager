@@ -1,7 +1,9 @@
 package org.example.docauthormanager.document.service;
 
 import jakarta.persistence.EntityNotFoundException;
+import org.example.docauthormanager.document.converter.DocumentDTOConverter;
 import org.example.docauthormanager.document.entities.Document;
+import org.example.docauthormanager.document.entities.DocumentDTO;
 import org.example.docauthormanager.document.repository.DocumentRepository;
 import org.springframework.stereotype.Service;
 
@@ -11,9 +13,11 @@ import java.util.List;
 public class DocumentServiceImpl implements DocumentService {
 
     private final DocumentRepository documentRepository;
+    private final DocumentDTOConverter documentDTOConverter;
 
-    public DocumentServiceImpl(DocumentRepository documentRepository) {
+    public DocumentServiceImpl(DocumentRepository documentRepository, DocumentDTOConverter documentDTOConverter) {
         this.documentRepository = documentRepository;
+        this.documentDTOConverter = documentDTOConverter;
     }
 
     @Override
@@ -28,18 +32,18 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
     @Override
-    public Document createDocument(final Document document) {
-        return documentRepository.save(document);
+    public Document createDocument(final DocumentDTO document) {
+        return documentRepository.save(documentDTOConverter.convert(document));
     }
 
     @Override
-    public Document updateDocument(final Long documentId, final Document newDocument) {
+    public Document updateDocument(final Long documentId, final DocumentDTO newDocument) {
         return documentRepository.findById(documentId)
                 .map(document -> {
-                    document.setTitle(newDocument.getTitle());
-                    document.setAuthors(newDocument.getAuthors());
-                    document.setBody(newDocument.getBody());
-                    document.setReferences(newDocument.getReferences());
+                    document.setTitle(newDocument.title());
+                    document.setAuthors(newDocument.authors());
+                    document.setBody(newDocument.body());
+                    document.setReferences(newDocument.references());
                     return documentRepository.save(document);
                 }).orElseThrow(EntityNotFoundException::new);
     }
