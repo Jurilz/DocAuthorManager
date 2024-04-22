@@ -21,8 +21,8 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.postgresql:postgresql")
-//    implementation("org.springframework.boot:spring-boot-starter-security")
-
+    implementation("org.springframework.boot:spring-boot-starter-security")
+    implementation("org.springframework.security:spring-security-config:6.2.4")
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.5.0")
 
     runtimeOnly("com.h2database:h2")
