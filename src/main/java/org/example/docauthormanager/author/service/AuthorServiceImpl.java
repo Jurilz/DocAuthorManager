@@ -1,8 +1,11 @@
 package org.example.docauthormanager.author.service;
 
 import jakarta.persistence.EntityNotFoundException;
+import org.example.docauthormanager.author.converter.AuthorDTOConverter;
 import org.example.docauthormanager.author.entities.Author;
+import org.example.docauthormanager.author.entities.AuthorDTO;
 import org.example.docauthormanager.author.repository.AuthorRepository;
+import org.example.docauthormanager.messages.rabbitmq.AuthorMessageSender;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -11,9 +14,13 @@ import java.util.List;
 public class AuthorServiceImpl implements AuthorService{
 
     private final AuthorRepository authorRepository;
+    private final AuthorDTOConverter authorDTOConverter;
+    private final AuthorMessageSender messageSender;
 
-    public AuthorServiceImpl(AuthorRepository authorRepository) {
+    public AuthorServiceImpl(AuthorRepository authorRepository, AuthorDTOConverter authorDTOConverter, AuthorMessageSender messageSender) {
         this.authorRepository = authorRepository;
+        this.authorDTOConverter = authorDTOConverter;
+        this.messageSender = messageSender;
     }
 
     @Override
@@ -28,16 +35,18 @@ public class AuthorServiceImpl implements AuthorService{
     }
 
     @Override
-    public Author createAuthor(final Author author) {
-        return authorRepository.save(author);
+    public Author createAuthor(final AuthorDTO authorDTO) {
+        return authorRepository.save(authorDTOConverter.convert(authorDTO));
     }
 
     @Override
-    public Author updateAuthor(final Long authorId, final Author newAuthor) {
+    public Author updateAuthor(final Long authorId, final AuthorDTO newAuthor) {
+        messageSender.sendAuthorMessage(newAuthor.toString());
+
         return authorRepository.findById(authorId)
                 .map(authorToUpdate -> {
-                    authorToUpdate.setFirstName(newAuthor.getFirstName());
-                    authorToUpdate.setLastName(newAuthor.getLastName());
+                    authorToUpdate.setFirstName(newAuthor.firstName());
+                    authorToUpdate.setLastName(newAuthor.latName());
                     return authorRepository.save(authorToUpdate);
                 }).orElseThrow(EntityNotFoundException::new);
     }
