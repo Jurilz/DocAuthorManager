@@ -3,4 +3,10 @@ package org.example.docauthormanager.author.repository;
 import org.example.docauthormanager.author.entities.Author;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface AuthorRepository extends JpaRepository<Author, Long> { }
+import java.util.Optional;
+
+public interface AuthorRepository extends JpaRepository<Author, Long> {
+
+    Optional<Author> findAuthorByFirstNameAndLastName(String firstName, String lastName);
+}
+
