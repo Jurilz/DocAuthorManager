@@ -2,6 +2,7 @@ package org.example.docauthormanager.author;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.persistence.EntityNotFoundException;
 import org.example.docauthormanager.author.entities.Author;
 import org.example.docauthormanager.author.entities.AuthorDTO;
 import org.example.docauthormanager.author.repository.AuthorRepository;
@@ -19,6 +20,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -77,6 +79,16 @@ public class AuthControllerTest {
     }
 
     @Test
+    public void testCreateWithWrongContent() throws Exception {
+
+        mockMvc.perform(post(AUTHORS_ENDPOINT)
+                        .with(user(USERNAME).password(PASSWORD).roles(ADMIN_ROLE))
+                        .content("{\"field\": \"does not exist\"}")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
     public void testFindById() throws Exception {
         final Author author = new Author(
                 "Michael",
@@ -92,6 +104,30 @@ public class AuthControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.firstName").value(author.getFirstName()))
                 .andExpect(jsonPath("$.lastName").value(author.getLastName()));
+    }
+
+    @Test
+    public void testFindAll() throws Exception {
+        final Author authorOne = new Author(
+                "Michael",
+                "Bulgakow"
+        );
+
+        final Author authorTwo = new Author(
+                "Nikolai",
+                "Gogol"
+        );
+
+        Mockito.when(repository.findAll())
+                .thenAnswer(invocationOnMock -> List.of(authorOne, authorTwo));
+
+        mockMvc.perform(get(AUTHORS_ENDPOINT)
+                        .with(user(USERNAME).password(PASSWORD).roles(ADMIN_ROLE)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].firstName").value(authorOne.getFirstName()))
+                .andExpect(jsonPath("$[0].lastName").value(authorOne.getLastName()))
+                .andExpect(jsonPath("$[1].firstName").value(authorTwo.getFirstName()))
+                .andExpect(jsonPath("$[1].lastName").value(authorTwo.getLastName()));
     }
 
     @Test
@@ -123,6 +159,23 @@ public class AuthControllerTest {
                 .andExpect(jsonPath("$.lastName").value(updatedAuthor.latName()));
 
         Mockito.verify(messageSender).sendAuthorMessage(updatedAuthor.toString());
+    }
+    @Test
+    public void testUpdateEntityNotFound() throws Exception {
+        final AuthorDTO updatedAuthor = new AuthorDTO(
+                "Michael",
+                "Bulgakow"
+        );
+
+        long authorId = 43L;
+        Mockito.when(repository.findById(authorId))
+                .thenThrow(new EntityNotFoundException());
+
+        mockMvc.perform(put(AUTHORS_ENDPOINT + "/" + authorId)
+                        .with(user(USERNAME).password(PASSWORD).roles(ADMIN_ROLE))
+                        .content(objectMapper.writeValueAsBytes(updatedAuthor))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
     }
 
     @Test
