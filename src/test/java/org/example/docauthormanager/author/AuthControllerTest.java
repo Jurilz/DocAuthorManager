@@ -39,6 +39,7 @@ public class AuthControllerTest {
     protected static final String PASSWORD = "password";
     protected static final String ADMIN_ROLE = "ADMIN";
     protected static final String USERNAME = "admin";
+
     @Autowired
     private MockMvc mockMvc;
 
