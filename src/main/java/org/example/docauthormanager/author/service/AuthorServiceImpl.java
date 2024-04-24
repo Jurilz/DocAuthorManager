@@ -4,11 +4,14 @@ import jakarta.persistence.EntityNotFoundException;
 import org.example.docauthormanager.author.converter.AuthorDTOConverter;
 import org.example.docauthormanager.author.entities.Author;
 import org.example.docauthormanager.author.entities.AuthorDTO;
+import org.example.docauthormanager.author.events.AuthorEvent;
+import org.example.docauthormanager.author.events.EventType;
 import org.example.docauthormanager.author.repository.AuthorRepository;
 import org.example.docauthormanager.messages.rabbitmq.AuthorMessageSender;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class AuthorServiceImpl implements AuthorService{
@@ -36,19 +39,27 @@ public class AuthorServiceImpl implements AuthorService{
 
     @Override
     public Author createAuthor(final AuthorDTO authorDTO) {
-        return authorRepository.save(authorDTOConverter.convert(authorDTO));
+        Author createdAuthor = authorRepository.save(authorDTOConverter.convert(authorDTO));
+
+        final AuthorEvent event = new AuthorEvent(EventType.CREATED, createdAuthor);
+        messageSender.sendAuthorMessage(event);
+
+        return createdAuthor;
     }
 
     @Override
     public Author updateAuthor(final Long authorId, final AuthorDTO newAuthor) {
-        messageSender.sendAuthorMessage(newAuthor.toString());
+        Optional<Author> author = authorRepository.findById(authorId);
 
-        return authorRepository.findById(authorId)
-                .map(authorToUpdate -> {
-                    authorToUpdate.setFirstName(newAuthor.firstName());
-                    authorToUpdate.setLastName(newAuthor.latName());
-                    return authorRepository.save(authorToUpdate);
-                }).orElseThrow(EntityNotFoundException::new);
+        return author.map(authorToUpdate -> {
+            authorToUpdate.setFirstName(newAuthor.firstName());
+            authorToUpdate.setLastName(newAuthor.lastName());
+
+            final AuthorEvent event = new AuthorEvent(EventType.UPDATED, authorToUpdate);
+            messageSender.sendAuthorMessage(event);
+
+            return authorRepository.save(authorToUpdate);
+        }).orElseThrow(EntityNotFoundException::new);
     }
 
     @Override
