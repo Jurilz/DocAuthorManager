@@ -13,7 +13,7 @@ public class AuthorDTOConverter implements Converter<AuthorDTO, Author> {
     public Author convert(AuthorDTO source) {
         return new Author(
             source.firstName(),
-            source.latName()
+            source.lastName()
         );
     }
 }
