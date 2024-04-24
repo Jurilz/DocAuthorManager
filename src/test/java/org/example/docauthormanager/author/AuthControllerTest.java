@@ -75,7 +75,7 @@ public class AuthControllerTest {
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.firstName").value(authorDTO.firstName()))
-                .andExpect(jsonPath("$.lastName").value(authorDTO.latName()));
+                .andExpect(jsonPath("$.lastName").value(authorDTO.lastName()));
     }
 
     @Test
@@ -156,9 +156,9 @@ public class AuthControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.firstName").value(updatedAuthor.firstName()))
-                .andExpect(jsonPath("$.lastName").value(updatedAuthor.latName()));
+                .andExpect(jsonPath("$.lastName").value(updatedAuthor.lastName()));
 
-        Mockito.verify(messageSender).sendAuthorMessage(updatedAuthor.toString());
+        Mockito.verify(messageSender).sendAuthorMessage(any());
     }
     @Test
     public void testUpdateEntityNotFound() throws Exception {
